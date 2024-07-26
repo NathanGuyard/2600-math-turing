@@ -304,6 +304,78 @@ def test_turing_machine_binary_multiplication(
         request.config.getoption("force_regen"),
     )
 
+def test_invalid_transition_direction():
+    machine = {
+        "blank": "0",
+        "start state": "e1",
+        "final states": ["done"],
+        "table": {
+            "e1": {
+                "1": "X"  # Invalid direction
+            },
+            "done": {},
+        },
+    }
+    with pytest.raises(ValueError, match="Invalid transition direction: X"):
+        run_turing_machine(machine, "1")
+
+def test_no_transition_for_symbol():
+    machine = {
+        "blank": "0",
+        "start state": "e1",
+        "final states": ["done"],
+        "table": {
+            "e1": {
+                "1": {"write": "0", "R": "e2"},
+            },
+            "e2": {
+                "0": {"write": "1", "R": "done"},
+            },
+            "done": {},
+        },
+    }
+
+    input_ = "11"
+    output, execution_history, accepted = run_turing_machine(machine, input_)
+    assert output == "1" 
+    assert not accepted
+
+def test_invalid_transition_direction():
+    machine = {
+        "blank": "0",
+        "start state": "e1",
+        "final states": ["done"],
+        "table": {
+            "e1": {
+                "1": "X" 
+            },
+            "done": {},
+        },
+    }
+    with pytest.raises(ValueError, match="Invalid transition direction: X"):
+        run_turing_machine(machine, "1")
+
+def test_no_direction_in_transition():
+    machine = {
+        "blank": "0",
+        "start state": "e1",
+        "final states": ["done"],
+        "table": {
+            "e1": {
+                "1": {"write": "0", "R": "e2"},
+            },
+            "e2": {
+                "0": {"write": "1"}, 
+            },
+            "done": {},
+        },
+    }
+
+    input_ = "10"
+    output, execution_history, accepted = run_turing_machine(machine, input_)
+    assert output == "1"
+    assert not accepted
+
 
 def to_dict(keys: List[str], value: Any) -> Dict[str, Any]:
     return {key: value for key in keys}
